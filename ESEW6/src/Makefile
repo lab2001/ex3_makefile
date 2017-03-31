@@ -1,0 +1,30 @@
+# Makefile sample
+
+CC=gcc
+AR=ar
+CFLAGS=-fPIC -Wall -g -c read.c
+INCLUDE=-I../inc
+LIBS=-L./ -lmyio
+LIBTARGET=libmyio.so
+
+SRCS=read.c write.c
+OBJS=$(SRCS:.c=.o)
+
+.SUFFIXES:.c.o
+.c.o:
+	$(CC) $(CFLAGS) $(INCLUDE) $<
+
+all: test
+
+test: main.o $(LIBTARGET)
+	$(CC) -o $@ main.o $(LIBS)
+	export LD_LIBRARY_PATH=$PWD
+	echo $LD_LIBRARY_PATH
+
+$(LIBTARGET): $(OBJS)
+	gcc -shared -Wl,-soname,$(LIBTARGET) -o $(LIBTARGET).0.0 $(OBJS)
+	ln -sf $(LIBTARGET).0.0 $(LIBTARGET)
+
+clean:
+	rm -rf test *.o $(LIBTARGET)
+
